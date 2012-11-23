@@ -11,11 +11,17 @@ function parseDirectoryResults( result )
 	}
 	
 	// Load the files
+	var cwd = FileSystem.getCWD();
 	for(var i in result.result.files)
 	{
 		var fileName = result.result.files[i]['filename'];
-		$('#filelist').append('<a href="#" class="' + result.result.files[i]['extension'] + ' file thumbnail" title="' + fileName + '"><div class="preview"><img src="images/ajax-thumbnail-loader.gif" alt="Loading..." /></div><span class="filename">' + fileName + '</span></a>');
+		$('#filelist').append('<a href="#" class="' + result.result.files[i]['extension'] + ' file thumbnail" title="' + fileName + '"><div class="preview"><img src="images/ajax-thumbnail-loader.gif" class="lazy" data-original="' + cwd + fileName + '" width="94" height="94" alt="Loading..." /></div><span class="filename">' + fileName + '</span></a>');
 	}
+	
+	// Enable lazy loading
+	$("img.lazy").lazyload({
+		container: '#filelist'
+	});
 }
 
 $(document).ready(function() {
