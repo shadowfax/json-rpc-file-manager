@@ -1,0 +1,107 @@
+# Redirects página vieja
+redirect 301 /espaindice/espaindice.html /es/
+redirect 301 /contact/formcontacto.html /es/herramientas/contacto
+redirect 301 /historia/historia.html /es/empresa/historia
+redirect 301 /news/noticias.html /es/newsevents
+redirect 301 /news/exhibit.html /es/newsevents
+
+redirect 301 /home/home.html /en/
+redirect 301 /contact/contact.html /en/tools/contact
+redirect 301 /history/history.html /en/company/history
+redirect 301 /news/briefnews.html /en/newsevents
+
+redirect 301 /homefr/homefr.htm /fr/
+
+# Expires Headers - 2678400s = 31 days
+<ifmodule mod_expires.c>
+	ExpiresActive On
+	ExpiresDefault "access plus 1 seconds"
+	ExpiresByType text/html "access plus 7200 seconds"
+	ExpiresByType image/gif "access plus 604800 seconds"
+	ExpiresByType image/jpeg "access plus 604800 seconds"
+	ExpiresByType image/png "access plus 604800 seconds"
+	ExpiresByType text/css "access plus 43200 seconds"
+	ExpiresByType text/javascript "access plus 43200 seconds"
+	ExpiresByType application/x-javascript "access plus 43200 seconds"
+	ExpiresByType application/vnd.ms-fontobject "access plus 2678400 seconds"
+	ExpiresByType application/x-font-ttf  "access plus 2678400 seconds"
+	ExpiresByType application/x-font-woff "access plus 2678400 seconds"
+</ifmodule>
+
+# Cache Headers
+<IfModule mod_headers.c>
+	# Cache specified files for 31 days
+	<filesMatch "\.(eot|ttf|woff|svg)$">
+		Header unset Last-Modified
+		Header set Cache-Control "max-age=2678400, public"
+	</filesmatch>
+
+	# 1 week
+	<filesMatch "\.(ico|pdf)$">
+		Header unset Last-Modified
+		Header set Cache-Control "max-age=604800"
+	</filesMatch>
+
+	# 1 Week (Speed Insights)
+	<filesMatch "\.(gif|jpg|jpeg|png)$">
+		Header unset Last-Modified
+		Header set Cache-Control "max-age=604800"
+	</filesMatch>
+
+	# 12 hours
+	<filesMatch "\.(js|css)$">
+		Header unset Last-Modified
+		Header set Cache-Control "max-age=43200"
+	</filesMatch>
+
+	# Force no caching for dynamic files
+	<filesMatch "\.(php|cgi|pl)$">
+		Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+		Header set Pragma "no-cache"
+	</filesMatch>
+</IfModule>
+
+
+
+<IfModule mod_deflate.c>
+	# Causes error on Ibercom!
+	# DeflateCompressionLevel 9
+
+	# compress text, html, javascript, css, xml:
+	AddOutputFilterByType DEFLATE text/plain
+	AddOutputFilterByType DEFLATE text/html
+	AddOutputFilterByType DEFLATE text/xml
+	AddOutputFilterByType DEFLATE text/css
+	AddOutputFilterByType DEFLATE text/javascript
+	AddOutputFilterByType DEFLATE application/xml
+	AddOutputFilterByType DEFLATE application/xhtml+xml
+	AddOutputFilterByType DEFLATE application/rss+xml
+	AddOutputFilterByType DEFLATE application/javascript
+	AddOutputFilterByType DEFLATE application/x-javascript
+
+	AddOutputFilterByType DEFLATE image/svg+xml
+	AddOutputFilterByType DEFLATE application/vnd.ms-fontobject 
+	AddOutputFilterByType DEFLATE application/x-font-ttf 
+	AddOutputFilterByType DEFLATE font/opentype
+
+	BrowserMatch ^Mozilla/4 gzip-only-text/html
+	BrowserMatch ^Mozilla/4\.0[678] no-gzip
+	BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+
+	# Causes error on Ibercom!!!
+	# DeflateFilterNote Input instream
+	# DeflateFilterNote Output outstream
+	# DeflateFilterNote Ratio ratio
+</IfModule>
+
+# Default charset
+AddDefaultCharset utf-8
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} -s [OR]
+RewriteCond %{REQUEST_FILENAME} -l [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [NC,L]
+RewriteRule ^.*$ index.php [NC,L]
+
+
