@@ -70,14 +70,16 @@ body { font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial,
  *  A Windows Thumbnail is 96x96
  *    The border is 2px wide #316ac5
 */
+#filelist.thumbnail {
+	padding:5px;
+}
 #filelist.thumbnail .file {
 	position: relative;
 	display:block;
 	float:left;
 	width:98px;
 	height:120px;
-	margin-left:10px;
-	margin-top:10px;
+	margin:5px;
 }
 
 #filelist.thumbnail .file:hover > .preview {
