@@ -82,7 +82,7 @@ class Application_Model_Filemanager
 				} elseif($file->isFile()) {
 					$result['files'][] = array(
 						'filename'	=> $file->getFilename(),
-						'extension'	=> $file->getExtension()
+						'extension'	=> strtolower($file->getExtension())	/* always lower to avoid errors */
 					);
 				}
 			}
