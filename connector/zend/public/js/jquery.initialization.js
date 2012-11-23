@@ -1,3 +1,5 @@
+//var tinyMCEPopup = null;
+
 function parseDirectoryResults( result )
 {
 	// Clear files
@@ -15,16 +17,21 @@ function parseDirectoryResults( result )
 	for(var i in result.result.files)
 	{
 		var fileName = result.result.files[i]['filename'];
-		$('#filelist').append('<a href="#" class="' + result.result.files[i]['extension'] + ' file thumbnail" title="' + fileName + '"><div class="preview"><img src="images/ajax-thumbnail-loader.gif" class="lazy" data-original="' + cwd + fileName + '" width="94" height="94" alt="Loading..." /></div><span class="filename">' + fileName + '</span></a>');
+		$('#filelist').append('<a href="' + cwd + fileName + '" class="' + result.result.files[i]['extension'] + ' file thumbnail" title="' + fileName + '"><div class="preview"><img src="images/ajax-thumbnail-loader.gif" class="lazy" data-original="' + cwd + fileName + '" width="94" height="94" alt="Loading..." /></div><span class="filename">' + fileName + '</span></a>');
 	}
 	
 	// Enable lazy loading
 	$("img.lazy").lazyload({
-		container: '#filelist'
+		container: '#filelist',
+		effect: 'fadeIn'
 	});
 }
 
 $(document).ready(function() {
+	
+	//if (typeof(window.tinyMCEPopup) !== 'undefined') {
+	//	tinyMCEPopup = window.tinyMCEPopup;
+	//}
 	
 	$.jsonRPC.setup({
 		endPoint: "/js/tiny_mce/plugins/imagemanager/connector/zend/public/filemanager/service"
@@ -98,7 +105,26 @@ $(document).ready(function() {
 		event.preventDefault();
 		
 		// ToDo: Return the selected file to the file manager
-		
+		var URL = $(this).attr('href');
+		var win = window.tinyMCEPopup.getWindowArg("window");
+
+        // insert information now
+        win.document.getElementById(tinyMCEPopup.getWindowArg("input")).value = URL;
+
+        // are we an image browser
+        if (typeof(win.ImageDialog) != "undefined") {
+            // we are, so update image dimensions...
+            if (win.ImageDialog.getImageData)
+                win.ImageDialog.getImageData();
+
+            // ... and preview if necessary
+            if (win.ImageDialog.showPreviewImage)
+                win.ImageDialog.showPreviewImage(URL);
+        }
+        
+        // close popup window
+        tinyMCEPopup.close();
+        
 		return false;
 	});
 	
