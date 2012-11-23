@@ -61,6 +61,13 @@ var FileSystem = {
 	        }
 	    }
 	},
+	/**
+	 * Retrieve the current working directory
+	 */
+	getCWD : function() {
+		if (this._helper.cwd.match("\/$")) return this._helper.cwd;
+		return this._helper.cwd + '/';
+	},
 	/*******************************
 	 * JSON RPC METHODS START HERE *
 	 *******************************/
@@ -70,9 +77,9 @@ var FileSystem = {
 	cd : function(directory, callbacks) {
 		directory = this._helper.getAbsolutePath(directory);
 		this._helper.request('cd', {directory: directory}, {
-			success: function( result ) {
+			success: function( response ) {
 				// Set the new current working directory
-				this._helper.cwd = directory;
+				FileSystem._helper.cwd = directory;
 				
 				if (typeof(callbacks.success) === 'function') {
 					callbacks.success( response );

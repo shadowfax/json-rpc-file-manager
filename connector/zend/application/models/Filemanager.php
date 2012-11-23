@@ -52,15 +52,15 @@ class Application_Model_Filemanager
 		}
 		
 		$result = array(
-			'directories'	=> array(),
-			'files'			=> array()
+			'folders'	=> array(),
+			'files'		=> array()
 		);
 		
 		$dir = new DirectoryIterator($directory);
 		foreach($dir as $file) {
 			if (!$file->isDot()) {
 				if ($file->isDir()) {
-					$result['directories'][] = array(
+					$result['folders'][] = array(
 						'filename'	=> $file->getFilename()
 					);
 				} elseif($file->isFile()) {
