@@ -1,3 +1,15 @@
+function parseDirectoryResults( result )
+{
+	// Clear files
+	$('#filelist').html('');
+	
+	// Load the files
+	for(var i in result.result.files)
+	{
+		$('#filelist').append('<a href="#" class="' + result.result.files[i]['extension'] + ' file thumbnail"><div class="preview"><img src="images/ajax-thumbnail-loader.gif" alt="Loading..." /></div><span class="filename">' + result.result.files[i]['filename'] + '</span></a>');
+	}
+}
+
 $(document).ready(function() {
 	
 	$.jsonRPC.setup({
@@ -11,6 +23,7 @@ $(document).ready(function() {
 		FileSystem.ls(null, {
 			success: function(result) {
 				// ToDo: display the results!!!
+				parseDirectoryResults(result);
 			},
 			error: function(result) {
 				alert(result.error.message);
@@ -37,6 +50,7 @@ $(document).ready(function() {
 	FileSystem.ls('/', {
 		success: function(result) {
 			// ToDo: display the results!!!
+			parseDirectoryResults(result);
 		},
 		error: function(result) {
 			alert(result.error.message);

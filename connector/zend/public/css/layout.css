@@ -64,3 +64,45 @@ body { font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial,
 	background-repeat:no-repeat;
 	background-position:4px 4px;
 }
+
+/**
+ *  Thumbnail file list
+ *  A Windows Thumbnail is 96x96
+ *    The border is 2px wide #316ac5
+*/
+#filelist.thumbnail .file {
+	position: relative;
+	display:block;
+	float:left;
+	width:98px;
+	height:120px;
+	margin-left:10px;
+	margin-top:10px;
+}
+
+#filelist.thumbnail .file:hover > .preview {
+	border:1px solid #316ac5;
+}
+
+#filelist.thumbnail .preview {
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:96px;
+	height:96px;
+	border:1px solid #e4e4e4;
+}
+
+#filelist.thumbnail span.filename {
+	position:absolute;
+	bottom:2;
+	left:2;
+	right:0;
+	font-size:10px;
+	text-align:center;
+	color:#464646;
+	
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
