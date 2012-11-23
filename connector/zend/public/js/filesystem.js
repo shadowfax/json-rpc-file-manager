@@ -1,5 +1,4 @@
 var FileSystem = {
-	
 	/**
 	 * Helpers
 	 */
@@ -13,6 +12,10 @@ var FileSystem = {
 		 */
 		commonParameters : {},
 		/**
+		 * Options (or configuration) received from init method
+		 */
+		options : null,
+		/**
 		 * Forge the absolute url using the current working directory.
 		 * If the path name starts with "/" we consider it is an
 		 * absolute path already.
@@ -22,13 +25,26 @@ var FileSystem = {
 			if (!this.cwd.match("\/$")) this.cwd += '/';
 			return this.cwd + pathname;
 		},
+		/**
+		 * Send a request to the server
+		 */
 		request: function(method, params, callbacks) {
+			var requestParams = this.commonParameters;
+			
+			for (var property in params) {
+		        if (params.hasOwnProperty(property)) {
+		            requestParams[property] = params[property];
+		        }
+		    }
+			
 			$.jsonRPC.request(method, {
-				params: params,
+				params: requestParams,
 				success: function( response ) {
-					if (typeof(callbacks.success) === 'function') {
-						callbacks.success( response );
-					}
+					//if (typeof(callbacks) !== 'undefined') {
+						if (typeof(callbacks.success) === 'function') {
+							callbacks.success( response );
+						}
+					//}
 				},
 				error: function( response ) {
 					if (typeof(callbacks.error) === 'function') {
@@ -68,9 +84,46 @@ var FileSystem = {
 		if (this._helper.cwd.match("\/$")) return this._helper.cwd;
 		return this._helper.cwd + '/';
 	},
+	/**
+	 * Get an option from the options (Configuration) received from the server
+	 */
+	getOption : function( option ) {
+		if (this._helper.options === null) {
+			// ToDo: Send init request as it should be an empty array
+			return null;
+		} else if (typeof(this._helper.options[option]) !== 'undefined') {
+			return this._helper.options[option];
+		} else {
+			return null;
+		}
+	},
 	/*******************************
 	 * JSON RPC METHODS START HERE *
 	 *******************************/
+	/**
+	 * This method simply tells the server we are initializing the JavaScript library.
+	 * It is _NOT_ manadatory to issue this request, however it is the way to get
+	 * some configuration back from the server. 
+	 * 
+	 * For example, if I need to get the url to a page serving thumbnail images or 
+	 * file extension images, this is the right place.
+	 */
+	init : function(callbacks) {
+		this._helper.request('init', null, {
+			success : function( result ) {
+				FileSystem._helper.options = result.result;
+				if (typeof(callbacks.success) === 'function') {
+					callbacks.success( result );
+				}
+			},
+			error : function( result ) {
+				if (typeof(callbacks.error) === 'function') {
+					callbacks.error( result );
+				}
+			}
+		});
+		return false;
+	},
 	/**
 	 * Change current working directory
 	 */

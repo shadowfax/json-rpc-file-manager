@@ -10,6 +10,22 @@ class Application_Model_Filemanager
 	}
 	
 	/**
+	 * JavaScript library is telling us it is initializing.
+	 * Serve any appropiate configuration back to the library.
+	 */
+	public function init()
+	{
+		$result = array();
+		
+		// What file extension have thumbnails?
+		$result['thumbnails_for'] = implode(",", array("jpg", "png", "gif"));
+		
+		#TODO: I need to know what URL to call in order to get the thumbnails.
+		
+		return $result;
+	}
+	
+	/**
 	 * Javascript library is asking if it can change directories.
 	 * 
 	 * @param string $directory

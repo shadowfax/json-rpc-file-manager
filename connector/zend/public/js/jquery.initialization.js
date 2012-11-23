@@ -1,5 +1,7 @@
 //var tinyMCEPopup = null;
 
+var filesystemOptions = {};
+
 function parseDirectoryResults( result )
 {
 	// Clear files
@@ -14,10 +16,21 @@ function parseDirectoryResults( result )
 	
 	// Load the files
 	var cwd = FileSystem.getCWD();
+	var thumbnails_for = {};
+	var szThumbnailsFor = FileSystem.getOption('thumbnails_for');
+	if (szThumbnailsFor !== null) {
+		thumbnails_for = szThumbnailsFor.split(",");
+		szThumbnailsFor = null;
+	}
 	for(var i in result.result.files)
 	{
 		var fileName = result.result.files[i]['filename'];
-		$('#filelist').append('<a href="' + cwd + fileName + '" class="' + result.result.files[i]['extension'] + ' file thumbnail" title="' + fileName + '"><div class="preview"><img src="images/ajax-thumbnail-loader.gif" class="lazy" data-original="' + cwd + fileName + '" width="94" height="94" alt="Loading..." /></div><span class="filename">' + fileName + '</span></a>');
+		var fileExtension = result.result.files[i]['extension'];
+		if (thumbnails_for.indexOf(fileExtension) > -1) {
+			$('#filelist').append('<a href="' + cwd + fileName + '" class="' + fileExtension + ' file thumbnail" title="' + fileName + '"><div class="preview"><img src="images/ajax-thumbnail-loader.gif" class="lazy" data-original="' + cwd + fileName + '" width="94" height="94" alt="Loading..." /></div><span class="filename">' + fileName + '</span></a>');
+		} else {
+			$('#filelist').append('<a href="' + cwd + fileName + '" class="' + fileExtension + ' file thumbnail" title="' + fileName + '"><div class="preview"><img src="images/ajax-thumbnail-loader.gif" width="94" height="94" alt="Loading..." /></div><span class="filename">' + fileName + '</span></a>');
+		}
 	}
 	
 	// Enable lazy loading
@@ -129,8 +142,35 @@ $(document).ready(function() {
 	});
 	
 	/**
+	 * Tell the service we are initializing the library so it sends us 
+	 * the configuration data.
+	 */
+	FileSystem.init({
+		success: function(result) {
+			// Finally call 'ls' on the root path to populate the file and directory tree!
+			FileSystem.ls('/', {
+				success: function(result) {
+					// ToDo: display the results!!!
+					parseDirectoryResults(result);
+				},
+				error: function(result) {
+					alert(result.error.message);
+				}
+			});
+		},
+		error : function(result) {
+			// close popup window
+	        //tinyMCEPopup.close();
+	        
+	        // Alert the user
+			alert(result.error.message);
+		}
+	});
+	
+	/**
 	 * Finally call 'ls' on the root path to populate the file and directory tree!
 	 */
+	/*
 	FileSystem.ls('/', {
 		success: function(result) {
 			// ToDo: display the results!!!
@@ -140,4 +180,5 @@ $(document).ready(function() {
 			alert(result.error.message);
 		}
 	});
+	*/
 });
