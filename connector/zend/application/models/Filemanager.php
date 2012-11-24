@@ -47,9 +47,11 @@ class Application_Model_Filemanager
 			throw new Zend_Json_Server_Exception("Access denied", -32000);
 		}
 		
+		// Remove the document path from the 
 		// The response returns a little info about the directory
 		// For example, we could disable uploads if it is not writable ;)
 		$result = array(
+			'cwd'		=> $this->_getRelativePath($directory),
 			'readable'	=> true, /* If it was not so an error would have been sent earlier */
 			'writable'	=> is_writable($directory)
 		);
@@ -110,6 +112,16 @@ class Application_Model_Filemanager
 		return $result;
 	}
 
+	protected function _isAbsolutePath($pathname) 
+	{
+		$document_root = $this->_getDocumentRoot();
+		if (strlen($pathname) >= strlen($document_root)) {
+			if (strpos(rtrim($pathname, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR, rtrim($document_root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR) === 0) return true;
+		}
+		
+		return false;
+	}
+	
 	/**
 	 * Get the absolute path to a file or folder.
 	 * 
@@ -121,6 +133,10 @@ class Application_Model_Filemanager
 	protected function _getAbsolutePath($pathname)
 	{
 		$document_root = $this->_getDocumentRoot();
+		
+		// If the path is already an absolute path just return
+		if ($this->_isAbsolutePath($pathname)) return $pathname;
+		
 		if (strlen($document_root) > 0) {	
 			$absolute_path = @realpath($document_root . $pathname);
 			if ($absolute_path !== false) {
@@ -140,6 +156,14 @@ class Application_Model_Filemanager
 		}
 		
 		throw new Zend_Json_Server_Exception("Access denied " . $absolute_path, -32000);
+	}
+	
+	protected function _getRelativePath($pathname)
+	{
+		$pathname = $this->_getAbsolutePath($pathname);
+		$document_root = rtrim($this->_getDocumentRoot(), DIRECTORY_SEPARATOR);
+		$pathname = substr($pathname, strlen($document_root));
+		return preg_replace("/\\\\/", "/", $pathname);
 	}
 	
 	/**

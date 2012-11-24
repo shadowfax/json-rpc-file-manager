@@ -97,6 +97,10 @@ var FileSystem = {
 			return null;
 		}
 	},
+	isRoot : function() {
+		if (this._helper.cwd == '/') return true;
+		return false;
+	},
 	/*******************************
 	 * JSON RPC METHODS START HERE *
 	 *******************************/
@@ -132,13 +136,13 @@ var FileSystem = {
 		this._helper.request('cd', {directory: directory}, {
 			success: function( response ) {
 				// Set the new current working directory
-				FileSystem._helper.cwd = directory;
+				FileSystem._helper.cwd = response.result.cwd;
 				
 				if (typeof(callbacks.success) === 'function') {
 					callbacks.success( response );
 				}
 			},
-			error: function( result ) {
+			error: function( response ) {
 				if (typeof(callbacks.error) === 'function') {
 					callbacks.error( response );
 				}

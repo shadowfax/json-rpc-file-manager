@@ -79,6 +79,38 @@ $(document).ready(function() {
 		return false;
 	});
 	
+	// capture click on go up a folder
+	$(".folder-up").live('click', function( event ) {
+		event.preventDefault();
+		FileSystem.cd($(this).attr('href'), {
+			success: function( result ) {
+				// We changed directories successfully
+				// so retrieve the contents
+				FileSystem.ls(null, {
+					success: function(result) {
+						// ToDo: display the results!!!
+						parseDirectoryResults(result);
+					},
+					error: function(result) {
+						alert(result.error.message);
+					}
+				});
+				
+				// If we are not at root, then show the up icon
+				if (FileSystem.isRoot()) {
+					$('#header .folder-up').hide();
+				} else {
+					console.log(FileSystem._helper.cwd);
+					$('#header .folder-up').show();
+				}
+			},
+			error: function( result ) {
+				alert( result.error.message );
+			}
+		});
+		return false;
+	});
+
 	// Capture click on folders
 	$("a.folder").live('click', function(event) {
 		event.preventDefault();
@@ -100,6 +132,13 @@ $(document).ready(function() {
 						alert(result.error.message);
 					}
 				});
+				
+				// If we are not at root, then show the up icon
+				if (FileSystem.isRoot()) {
+					$('#header .folder-up').hide();
+				} else {
+					$('#header .folder-up').show();
+				}
 			},
 			error: function( result ) {
 				alert( result.error.message );
