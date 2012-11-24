@@ -3,10 +3,16 @@
 class Application_Model_Filemanager
 {
 	protected $_documentRoot;
+	protected $_thumbnailsUri;
 
-	public function __construct()
+	public function __construct($arguments)
 	{
-		 $this->_documentRoot = realpath($_SERVER['DOCUMENT_ROOT']);
+		if (is_array($arguments)) {
+			if (isset($arguments['thumbnails_uri'])) {
+				$this->_thumbnailsUri = $arguments['thumbnails_uri'];
+			}
+		}
+		$this->_documentRoot = realpath($_SERVER['DOCUMENT_ROOT']);
 	}
 	
 	/**
@@ -19,7 +25,7 @@ class Application_Model_Filemanager
 		
 		// What file extension have thumbnails?
 		$result['thumbnails_for'] = implode(",", array("jpg", "png", "gif"));
-		
+		$result['thumbnails_uri'] = $this->_thumbnailsUri;
 		#TODO: I need to know what URL to call in order to get the thumbnails.
 		
 		return $result;
@@ -92,6 +98,8 @@ class Application_Model_Filemanager
 		unset($file);
 		unset($dir);
 		
+		#TODO: would be nice to send the response, close the connection, and process the directory for changes too create thumbnails. Should be possible but I guess I should modify the Server :/
+		
 		// return the results
 		return $result;
 	}
@@ -102,23 +110,52 @@ class Application_Model_Filemanager
 	 * The javascript library should be sending absolute paths
 	 * for what it knows, but not absolute paths for the server.
 	 * 
-	 * @param unknown_type $pathname
+	 * @param string $pathname
 	 */
 	protected function _getAbsolutePath($pathname)
 	{
-		if (is_string($this->_documentRoot)) {
-			if (strlen($this->_documentRoot) > 0) {	
-				$absolute_path = @realpath($this->_documentRoot . $pathname);
-				if ($absolute_path !== false) {
-					if (strlen($absolute_path) >= strlen($this->_documentRoot)) {
-						if (strcasecmp(substr($absolute_path, 0, strlen($this->_documentRoot)), $this->_documentRoot) === 0) {
-							return $absolute_path;
-						}
+		$document_root = $this->_getDocumentRoot();
+		if (strlen($document_root) > 0) {	
+			$absolute_path = @realpath($document_root . $pathname);
+			if ($absolute_path !== false) {
+				$document_root_len = strlen($document_root);
+				$absolute_path_len = strlen($absolute_path);
+				// Note: /var/www, /var/www2, ...
+				if ($absolute_path_len === $document_root_len) {
+					if (strcasecmp(substr($absolute_path, 0, $document_root_len), $document_root) === 0) {
+						return $absolute_path;
+					}
+				} elseif ($absolute_path_len > $document_root_len) {
+					if (strcasecmp(substr($absolute_path, 0, $document_root_len + 1), $document_root . DIRECTORY_SEPARATOR) === 0) {
+						return $absolute_path;
 					}
 				}
 			}
 		}
 		
 		throw new Zend_Json_Server_Exception("Access denied " . $absolute_path, -32000);
+	}
+	
+	/**
+	 * Get the document root path
+	 * 
+	 * @return string
+	 */
+	protected function _getDocumentRoot()
+	{
+		if (null === $this->_documentRoot) {
+			if (is_set($_SERVER['DOCUMENT_ROOT'])) {
+				$this->_documentRoot = @realpath($_SERVER['DOCUMENT_ROOT']);
+				if (empty($this->_documentRoot)) {
+					$this->_documentRoot = null;
+				}	
+			}
+			
+			if (null === $this->_documentRoot) {
+				throw new Zend_Json_Server_Exception("Unable to determine the location of document root", -32000);
+			}
+		}
+		
+		return $this->_documentRoot;
 	}
 }

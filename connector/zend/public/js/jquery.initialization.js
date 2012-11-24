@@ -22,6 +22,7 @@ function parseDirectoryResults( result )
 		thumbnails_for = szThumbnailsFor.split(",");
 		szThumbnailsFor = null;
 	}
+	var thumbnails_uri = FileSystem.getOption('thumbnails_uri');
 	for(var i in result.result.files)
 	{
 		var fileName = result.result.files[i]['filename'];
@@ -29,7 +30,7 @@ function parseDirectoryResults( result )
 		if (thumbnails_for.indexOf(fileExtension) > -1) {
 			$('#filelist').append('<a href="' + cwd + fileName + '" class="' + fileExtension + ' file thumbnail" title="' + fileName + '"><div class="preview"><img src="images/ajax-thumbnail-loader.gif" class="lazy" data-original="' + cwd + fileName + '" width="94" height="94" alt="Loading..." /></div><span class="filename">' + fileName + '</span></a>');
 		} else {
-			$('#filelist').append('<a href="' + cwd + fileName + '" class="' + fileExtension + ' file thumbnail" title="' + fileName + '"><div class="preview"><img src="images/ajax-thumbnail-loader.gif" width="94" height="94" alt="Loading..." /></div><span class="filename">' + fileName + '</span></a>');
+			$('#filelist').append('<a href="' + cwd + fileName + '" class="' + fileExtension + ' file thumbnail" title="' + fileName + '"><div class="preview"><img src="images/file-thumbnail.png" width="94" height="94" alt="Loading..." /></div><span class="filename">' + fileName + '</span></a>');
 		}
 	}
 	
