@@ -63,9 +63,10 @@ class Application_Model_Filemanager
 	 * 
 	 * @param string $directory
 	 */
-	public function ls($directory)
+	public function ls($directory, $flags = null)
 	{
 		$directory = $this->_getAbsolutePath($directory);
+		if ($flags === null) $flags = "";
 		
 		if (!is_dir($directory)) {
 			throw new Zend_Json_Server_Exception("Not a directory", -32000);
@@ -81,15 +82,20 @@ class Application_Model_Filemanager
 		$dir = new DirectoryIterator($directory);
 		foreach($dir as $file) {
 			if (!$file->isDot()) {
-				if ($file->isDir()) {
-					$result['folders'][] = array(
-						'filename'	=> $file->getFilename()
-					);
-				} elseif($file->isFile()) {
-					$result['files'][] = array(
-						'filename'	=> $file->getFilename(),
-						'extension'	=> strtolower($file->getExtension())	/* always lower to avoid errors */
-					);
+				$filename = $file->getFilename();
+
+				// Hide all files starting with "." except if "a" is present in flags
+				if ((substr($filename, 0, 1) !== '.') || (strpos($flags, 'a') !== false)) {
+					if ($file->isDir()) {
+						$result['folders'][] = array(
+							'filename'	=> $filename
+						);
+					} elseif($file->isFile()) {
+						$result['files'][] = array(
+							'filename'	=> $filename,
+							'extension'	=> strtolower($file->getExtension())	/* always lower to avoid errors */
+						);
+					}
 				}
 			}
 		}
